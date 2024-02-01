@@ -1,8 +1,9 @@
 from fastapi import APIRouter, HTTPException, Depends
-from ..schemas.user import UserCreate, UserUpdate, User, TagsUpdate
+from ..schemas.user import UserCreate, UserUpdate, User, TagsUpdate, TagsToRemove
 from ..utils.security import create_access_token, get_password_hash, verify_password
 from ..utils.database import get_database
 from bson import ObjectId
+
 
 router = APIRouter()
 
@@ -78,23 +79,23 @@ async def add_tags(user_id: str, tags_update: TagsUpdate, db=Depends(get_databas
 
 
 @router.delete("/users/{user_id}/tags", response_model=User)
-async def remove_tags(user_id: str, tags_update: TagsUpdate, db=Depends(get_database)):
+async def remove_tags(user_id: str, tags_to_remove: TagsToRemove, db=Depends(get_database)):
     user_collection = db.get_collection("users")
 
-    # Build a condition for $pull that matches the structure of TagMeta objects
-    # Assuming you want to remove tags based on matching 'name' field
-    tags_names = [tag.name for tag in tags_update.tags]
-    remove_condition = {"name": {"$in": tags_names}}
+    # Build a condition for $pull that matches the structure of the tags
+    remove_condition = {"name": {"$in": tags_to_remove.tags}}
 
+    # Update the user document by removing the specified tags
     await user_collection.update_one(
         {"_id": ObjectId(user_id)}, 
         {"$pull": {"tags": remove_condition}}
     )
 
+    # Retrieve the updated user document
     updated_user = await user_collection.find_one({"_id": ObjectId(user_id)})
     if updated_user:
         updated_user["id"] = str(updated_user["_id"])
         del updated_user["_id"]
         return User(**updated_user)
     else:
-        raise HTTPException(status_code=404, detail="Tag not found")
+        raise HTTPException(status_code=404, detail="User not found")

@@ -27,3 +27,5 @@ class User(UserBase):
 
 class TagsUpdate(BaseModel):
     tags: List[TagMeta]
+class TagsToRemove(BaseModel):
+    tags: List[str]
