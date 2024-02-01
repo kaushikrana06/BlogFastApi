@@ -63,11 +63,9 @@ This document provides an overview of the endpoints available in the BlogFastAPI
   - **JSON Body:**
     ```json
     {
-      "tags": [
-        {"name": "tag1"},
-        {"name": "tag2"}
-      ]
-    }
+  "tags": ["tag1", "tag2"]
+  }
+
     ```
 
 ### Blogs (`blog` router)
