@@ -63,8 +63,8 @@ This document provides an overview of the endpoints available in the BlogFastAPI
   - **JSON Body:**
     ```json
     {
-  "tags": ["tag1", "tag2"]
-  }
+    "tags": ["tag1", "tag2"]
+      }
 
     ```
 
